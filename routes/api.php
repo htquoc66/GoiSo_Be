@@ -43,6 +43,11 @@ Route::post('/nhan-benh/{quay}/reset', [NhanBenhController::class, 'reset']);
 
 // Update phân khu
 Route::post('/nhan-benh/{quay}/update-phankhu', [NhanBenhController::class, 'updatePhankhu']);
-
-
 Route::delete('/nhan-benh-logs/{id}', [NhanBenhController::class, 'deleteLog']);
+
+use App\Http\Controllers\BenhNhanController;
+
+Route::post('/benhnhan', [BenhNhanController::class, 'store']);   // quét thẻ + cấp số
+Route::get('/benhnhan', [BenhNhanController::class, 'index']);    // danh sách BN trong ngày
+Route::get('/sotts', [BenhNhanController::class, 'sott']);       // lấy số hiện tại
+

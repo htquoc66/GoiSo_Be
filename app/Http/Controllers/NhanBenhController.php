@@ -14,7 +14,7 @@ class NhanBenhController extends Controller
         return response()->json(NhanBenh::all());
     }
 
-    // Lấy log mới nhất (ví dụ 100 dòng gần nhất)
+    // Lấy log mới nhất
     public function logs()
     {
         return response()->json(
@@ -28,9 +28,15 @@ class NhanBenhController extends Controller
         $record = NhanBenh::firstOrCreate(['quay' => $quay]);
         $phankhu = $request->input('phankhu', $record->phankhu);
 
+        // mốc khởi tạo
+        $base = [
+            91 => 10000,
+            93 => 30000,
+        ];
+
         // lấy số lớn nhất trong phân khu
         $maxSo = NhanBenh::where('phankhu', $phankhu)->max('sott_thuong') ?? 0;
-        $soMoi = $maxSo + 1;
+        $soMoi = max($maxSo, $base[$phankhu] ?? 0) + 1;
 
         $record->phankhu = $phankhu;
         $record->sott_thuong = $soMoi;
@@ -53,8 +59,13 @@ class NhanBenhController extends Controller
         $record = NhanBenh::firstOrCreate(['quay' => $quay]);
         $phankhu = $request->input('phankhu', $record->phankhu);
 
+        // mốc khởi tạo
+        $base = [
+            92 => 20000,
+        ];
+
         $maxSo = NhanBenh::where('phankhu', $phankhu)->max('sott_uutien') ?? 0;
-        $soMoi = $maxSo + 1;
+        $soMoi = max($maxSo, $base[$phankhu] ?? 0) + 1;
 
         $record->phankhu = $phankhu;
         $record->sott_uutien = $soMoi;
@@ -80,17 +91,32 @@ class NhanBenhController extends Controller
 
         $phankhu = $record->phankhu;
 
+        // Định nghĩa mốc khởi tạo
+        $baseThuong = [
+            91 => 10000,
+            93 => 30000,
+        ];
+        $baseUuTien = [
+            92 => 20000,
+        ];
+
+        $sott_thuong = $baseThuong[$phankhu] ?? 0;
+        $sott_uutien = $baseUuTien[$phankhu] ?? 0;
+
+        // Reset tất cả quầy cùng phân khu về mốc
         NhanBenh::where('phankhu', $phankhu)->update([
-            'sott_thuong' => 0,
-            'sott_uutien' => 0,
-            'updated_at' => now()
+            'sott_thuong' => $sott_thuong,
+            'sott_uutien' => $sott_uutien,
+            'updated_at'  => now()
         ]);
 
-        // có thể ghi log reset nếu cần
         return response()->json([
-            'message' => "Đã reset tất cả quầy thuộc phân khu {$phankhu}"
+            'message' => "Đã reset tất cả quầy thuộc phân khu {$phankhu} về mốc khởi tạo",
+            'sott_thuong' => $sott_thuong,
+            'sott_uutien' => $sott_uutien,
         ]);
     }
+
 
     // Cập nhật phân khu cho quầy
     public function updatePhankhu(Request $request, $quay)
@@ -102,10 +128,10 @@ class NhanBenhController extends Controller
         return response()->json($record);
     }
 
+    // Xoá log
     public function deleteLog($id)
     {
         NhanBenhLog::where('id', $id)->delete();
         return response()->json(['message' => "Đã xoá log $id"]);
     }
-
 }

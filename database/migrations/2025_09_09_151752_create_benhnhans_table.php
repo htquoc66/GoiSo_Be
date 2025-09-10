@@ -15,14 +15,14 @@ return new class extends Migration
     {
         Schema::create('benh_nhans', function (Blueprint $table) {
            $table->id();
-    $table->string('mathe');
-    $table->string('hoten');
-    $table->string('ngaysinh')->nullable();
-    $table->unsignedInteger('phankhu');
-    $table->unsignedInteger('sott');
-    $table->timestamps();
+            $table->string('mathe')->nullable();
+            $table->string('hoten')->nullable();
+            $table->string('ngaysinh')->nullable();
+            $table->unsignedInteger('phankhu');
+            $table->unsignedInteger('sott');
+            $table->timestamps();
 
-    $table->index(['mathe', 'phankhu']);
+            $table->index(['mathe', 'phankhu']);
         });
     }
 

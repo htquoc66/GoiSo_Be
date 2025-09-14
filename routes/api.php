@@ -51,3 +51,4 @@ Route::post('/benhnhan', [BenhNhanController::class, 'store']);   // quét thẻ
 Route::get('/benhnhan', [BenhNhanController::class, 'index']);    // danh sách BN trong ngày
 Route::get('/sotts', [BenhNhanController::class, 'sott']);       // lấy số hiện tại
 
+Route::post('/thongtin-benhnhan', [BenhNhanController::class, 'thongtin']);

@@ -214,7 +214,6 @@ class BenhNhanController extends Controller
     }
 
 
-
     // API xem tất cả bệnh nhân trong ngày
     public function index()
     {
@@ -222,22 +221,55 @@ class BenhNhanController extends Controller
         return BenhNhan::whereDate('created_at', $today)->get();
     }
 
-// API lấy danh sách số hiện tại
-public function sott()
-{
-    $all = Sott::all();
-    $result = [];
+    // API lấy danh sách số hiện tại
+    public function sott()
+    {
+        $all = Sott::all();
+        $result = [];
 
-    foreach ($all as $s) {
-        if ($s->phankhu == 92) {
-            $result[$s->phankhu] = $s->sott_uutien;   // 👈 trả thẳng số
-        } else {
-            $result[$s->phankhu] = $s->sott_thuong;   // 👈 trả thẳng số
+        foreach ($all as $s) {
+            if ($s->phankhu == 92) {
+                $result[$s->phankhu] = $s->sott_uutien;   // 👈 trả thẳng số
+            } else {
+                $result[$s->phankhu] = $s->sott_thuong;   // 👈 trả thẳng số
+            }
         }
+
+        return response()->json($result);
     }
 
-    return response()->json($result);
-}
+
+    // API lấy thông tin bệnh nhân theo sott + phankhu
+    public function thongtin(Request $request)
+    {
+        $data = $request->validate([
+            'sott'    => 'required|integer',
+            'phankhu' => 'required|integer',
+        ]);
+
+        $today = now()->toDateString();
+
+        $benhNhan = BenhNhan::where('sott', $data['sott'])
+            ->where('phankhu', $data['phankhu'])
+            ->whereDate('created_at', $today)
+            ->first();
+
+        if (!$benhNhan) {
+            return response()->json([
+                'message' => 'Không tìm thấy bệnh nhân',
+            ], 404);
+        }
+
+        return response()->json([
+            'id'       => $benhNhan->id,
+            'hoten'    => $benhNhan->hoten,
+            'ngaysinh' => $benhNhan->ngaysinh,
+            'mathe'    => $benhNhan->mathe,
+            'phankhu'  => $benhNhan->phankhu,
+            'sott'     => $benhNhan->sott,
+        ]);
+    }
+
 
 
 }
